@@ -1,0 +1,6 @@
+CREATE TABLE client(
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(80) NOT NULL,
+    email VARCHAR(120) UNIQUE NOT NULL,
+    birth_date DATE NOT NULL
+);
