@@ -55,6 +55,10 @@ public class ClientService {
             client.setName(clientDto.getName());
         }
 
+        if (clientDto.getCpf() != null) {
+            client.setCpf(clientDto.getCpf());
+        }
+
         if (clientDto.getName() != null) {
             client.setEmail(clientDto.getEmail());
         }
