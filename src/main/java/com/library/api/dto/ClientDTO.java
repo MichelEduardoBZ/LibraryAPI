@@ -6,11 +6,13 @@ import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor
-public class ClientDto {
+public class ClientDTO {
 
     private Long id;
 
@@ -26,16 +28,18 @@ public class ClientDto {
     @Email(message = "Required format: name@domain")
     private String email;
 
+    @NotBlank(message = "Birth date is required")
     @JsonProperty("birth_date")
     @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "Required format: yyyy-MM-dd")
-    private LocalDate birthDate;
+    private String birthDate;
 
-    public ClientDto(Client entity) {
+    public ClientDTO(Client entity) {
         id = entity.getId();
         name = entity.getName();
         cpf = entity.getCpf();
         email = entity.getEmail();
-        birthDate = entity.getBirthDate();
+        birthDate = String.valueOf(entity.getBirthDate());
     }
+
 
 }

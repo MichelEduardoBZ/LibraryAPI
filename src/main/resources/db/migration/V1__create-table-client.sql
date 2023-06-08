@@ -1,4 +1,4 @@
-CREATE TABLE client(
+CREATE TABLE tb_client(
     id SERIAL PRIMARY KEY,
     name VARCHAR(80) NOT NULL,
     cpf VARCHAR(14) NOT NULL,

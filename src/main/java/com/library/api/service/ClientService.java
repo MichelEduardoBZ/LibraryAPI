@@ -1,6 +1,6 @@
 package com.library.api.service;
 
-import com.library.api.dto.ClientDto;
+import com.library.api.dto.ClientDTO;
 import com.library.api.entities.Client;
 import com.library.api.repository.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +10,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @Service
 public class ClientService {
 
@@ -17,31 +21,31 @@ public class ClientService {
     private ClientRepository repository;
 
     @Transactional
-    public ClientDto insertClient(ClientDto clientDto) {
+    public ClientDTO insertClient(ClientDTO clientDto) {
         Client client = new Client();
         copyDtoToEntity(clientDto, client);
         repository.save(client);
-        return new ClientDto(client);
+        return new ClientDTO(client);
     }
 
     @Transactional
-    public ClientDto updateClientById(Long id, ClientDto clientDto) {
+    public ClientDTO updateClientById(Long id, ClientDTO clientDto) {
         Client client = repository.getReferenceById(id);
         copyDtoToEntity(clientDto, client);
         repository.save(client);
-        return new ClientDto(client);
+        return new ClientDTO(client);
     }
 
     @Transactional(readOnly = true)
-    public ClientDto searchClientById(Long id) {
+    public ClientDTO searchClientById(Long id) {
         Client client = repository.getReferenceById(id);
-        return new ClientDto(client);
+        return new ClientDTO(client);
     }
 
     @Transactional(readOnly = true)
-    public Page<ClientDto> searchClients(Pageable pageable) {
-        Page<Client> client = repository.findAll(pageable);
-        return client.map(ClientDto::new);
+    public Page<ClientDTO> searchClients(Pageable pageable) {
+         Page<Client> clients = repository.findAll(pageable);
+         return clients.map(ClientDTO::new);
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
@@ -49,7 +53,7 @@ public class ClientService {
         repository.deleteById(id);
     }
 
-    public void copyDtoToEntity(ClientDto clientDto, Client client) {
+    public void copyDtoToEntity(ClientDTO clientDto, Client client) {
 
         if (clientDto.getName() != null) {
             client.setName(clientDto.getName());
@@ -64,7 +68,7 @@ public class ClientService {
         }
 
         if (clientDto.getBirthDate() != null) {
-            client.setBirthDate(clientDto.getBirthDate());
+            client.setBirthDate(LocalDate.parse(clientDto.getBirthDate()));
         }
     }
 }
