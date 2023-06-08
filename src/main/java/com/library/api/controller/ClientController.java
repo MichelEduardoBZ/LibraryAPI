@@ -20,33 +20,32 @@ public class ClientController {
     private ClientService clientService;
 
     @PostMapping
-    public ResponseEntity<ClientDTO> insertClient(@RequestBody @Valid ClientDTO clientDto){
+    public ResponseEntity<ClientDTO> insertClient(@RequestBody @Valid ClientDTO clientDto) {
         clientService.insertClient(clientDto);
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(clientDto.getId()).toUri();
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{id}").buildAndExpand(clientDto.getId()).toUri();
         return ResponseEntity.created(uri).body(clientDto);
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<ClientDTO> updateClient(@PathVariable Long id, @RequestBody @Valid ClientDTO clientDto){
+    public ResponseEntity<ClientDTO> updateClient(@PathVariable Long id, @RequestBody @Valid ClientDTO clientDto) {
         ClientDTO dto = clientService.updateClientById(id, clientDto);
         return ResponseEntity.ok(dto);
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<ClientDTO> searchById(@PathVariable Long id){
+    public ResponseEntity<ClientDTO> searchById(@PathVariable Long id) {
         ClientDTO dto = clientService.searchClientById(id);
         return ResponseEntity.ok(dto);
     }
 
     @GetMapping
-    public ResponseEntity<Page<ClientDTO>> searchClients(Pageable pageable){
+    public ResponseEntity<Page<ClientDTO>> searchClients(Pageable pageable) {
         Page<ClientDTO> clients = clientService.searchClients(pageable);
         return ResponseEntity.ok(clients);
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<ClientDTO> deleteClientById(@PathVariable Long id){
+    public ResponseEntity<ClientDTO> deleteClientById(@PathVariable Long id) {
         clientService.deleteById(id);
         return ResponseEntity.noContent().build();
     }

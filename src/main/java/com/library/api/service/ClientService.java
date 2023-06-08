@@ -11,8 +11,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class ClientService {
@@ -44,8 +42,8 @@ public class ClientService {
 
     @Transactional(readOnly = true)
     public Page<ClientDTO> searchClients(Pageable pageable) {
-         Page<Client> clients = repository.findAll(pageable);
-         return clients.map(ClientDTO::new);
+        Page<Client> clients = repository.findAll(pageable);
+        return clients.map(ClientDTO::new);
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)

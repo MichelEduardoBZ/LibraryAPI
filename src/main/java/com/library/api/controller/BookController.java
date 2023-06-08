@@ -20,7 +20,7 @@ public class BookController {
     private BookService service;
 
     @PostMapping
-    public ResponseEntity<BookDTO> insertBook(@RequestBody BookDTO bookDto) {
+    public ResponseEntity<BookDTO> insertBook(@RequestBody @Valid BookDTO bookDto) {
         bookDto = service.insertBook(bookDto);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{id}").buildAndExpand(bookDto.getId()).toUri();
         return ResponseEntity.created(uri).body(bookDto);

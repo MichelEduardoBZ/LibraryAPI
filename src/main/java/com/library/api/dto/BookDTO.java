@@ -25,7 +25,7 @@ public class BookDTO {
     @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "Required format: yyyy-MM-dd")
     private String yearOfPublication;
 
-    public BookDTO(Book book){
+    public BookDTO(Book book) {
         id = book.getId();
         name = book.getName();
         author = book.getAuthor();
