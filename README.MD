@@ -37,4 +37,4 @@ The idea is to create a system for a library, simple functions, example: CRUD be
 </table>
 
 # <h2>Data modeling for the concept</h2>
-![image](https://github.com/MichelEduardoBZ/LibraryAPI/assets/90931413/69aa664d-52ab-4d2b-98a1-3b56ce143876)
+![image](https://github.com/MichelEduardoBZ/LibraryAPI/assets/90931413/eb129c12-2852-4018-8ef7-aa1d487f9b1c)
