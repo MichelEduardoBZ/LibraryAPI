@@ -34,7 +34,7 @@ public class PhoneController {
 
     @GetMapping
     public ResponseEntity<Page<PhoneDTO>> searchBooks(Pageable pageable) {
-        Page<PhoneDTO> bookDtos = service.seatchPhones(pageable);
+        Page<PhoneDTO> bookDtos = service.searchPhones(pageable);
         return ResponseEntity.ok(bookDtos);
     }
 

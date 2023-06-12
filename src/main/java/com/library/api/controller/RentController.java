@@ -1,6 +1,7 @@
 package com.library.api.controller;
 
 import com.library.api.dto.RentDTO;
+import com.library.api.dto.RentPenaltyDTO;
 import com.library.api.service.RentService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,12 @@ public class RentController {
     public ResponseEntity<RentDTO> searchBookById(@PathVariable Long id) {
         RentDTO rentDTO = service.searchRentById(id);
         return ResponseEntity.ok(rentDTO);
+    }
+
+    @GetMapping(value = "penalty/{id}")
+    public ResponseEntity<Page<RentPenaltyDTO>> a(@PathVariable Long id) {
+        Page<RentPenaltyDTO> rentPenaltyDTO = service.validationPenaltyRent(id);
+        return ResponseEntity.ok(rentPenaltyDTO);
     }
 
     @DeleteMapping(value = "/{id}")

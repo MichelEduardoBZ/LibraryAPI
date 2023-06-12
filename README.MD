@@ -6,16 +6,15 @@
 
 The idea is to create a system for a library, simple functions, example: CRUD between books, customers and rents. Thus discovering new methods of doing something new and training.
 
-##🤯Features to be implemented in the future
+## 🤯Features implemented in the project
 
-1. Receive books by parameter and return them sorted by release date
-   most recent but not greater than the current date
+1. CRUD - Customer, Book, Phone and Rental
 
-2. Return the books that were received by grouped parameter
 
-3. Objects passed by parameter, requesting object and book object, must be checked if the requesting
-   he has a lease in his name and the 30-day period has passed. If the deadline has expired, the system must
-   calculate the 1% fine for each day passed after the deadline, and return the fine. Else returns 0.
+2. Book search grouped by author
+
+
+3. Based on the rent passed as a parameter, we see if the customer has any rents where the return date is past 30 days. If the deadline has expired, the system must calculate a fine of 1% for each day passed after the deadline and return the fine. Else returns 0.
 
 ## 🚀Technologies Used:
 
@@ -32,9 +31,9 @@ The idea is to create a system for a library, simple functions, example: CRUD be
       <td>3.0</td>
       <td>Null</td>
       <td>15.2</td>
-      <td>Null</td>
+      <td>Null</td>s
   </tr>
 </table>
 
 # <h2>Data modeling for the concept</h2>
-![image](https://github.com/MichelEduardoBZ/LibraryAPI/assets/90931413/eb129c12-2852-4018-8ef7-aa1d487f9b1c)
+![img.png](UML/img.png)

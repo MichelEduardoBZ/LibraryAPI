@@ -1,0 +1,1 @@
+ALTER TABLE tb_book RENAME name TO title;

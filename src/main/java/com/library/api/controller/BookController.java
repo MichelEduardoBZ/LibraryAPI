@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -42,6 +43,18 @@ public class BookController {
     public ResponseEntity<BookDTO> searchBookById(@PathVariable Long id) {
         BookDTO bookDto = service.searchBookById(id);
         return ResponseEntity.ok(bookDto);
+    }
+
+    @GetMapping(value = "/booksDate")
+    public ResponseEntity<Page<BookDTO>> searcBooksPublication(@PageableDefault(sort = {"yearOfPublication"}) Pageable pageable) {
+        Page<BookDTO> bookDtos = service.searchBooks(pageable);
+        return ResponseEntity.ok(bookDtos);
+    }
+
+    @GetMapping(value = "/author")
+    public ResponseEntity<Page<BookDTO>> searcBooksByAuthor(@RequestParam(name = "author", defaultValue = "") String author, Pageable pageable) {
+        Page<BookDTO> bookDtos = service.searchBookByAuthor(author, pageable);
+        return ResponseEntity.ok(bookDtos);
     }
 
     @DeleteMapping(value = "/{id}")

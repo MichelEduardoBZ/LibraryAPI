@@ -1,0 +1,1 @@
+ALTER TABLE tb_book ADD price_day_rent NUMERIC;

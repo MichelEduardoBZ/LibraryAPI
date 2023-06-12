@@ -3,7 +3,11 @@ package com.library.api.service;
 import com.library.api.dto.ClientDTO;
 import com.library.api.entities.Client;
 import com.library.api.repository.ClientRepository;
+import com.library.api.service.exceptions.DatabaseException;
+import com.library.api.service.exceptions.ResourceNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,15 +32,19 @@ public class ClientService {
 
     @Transactional
     public ClientDTO updateClientById(Long id, ClientDTO clientDto) {
-        Client client = repository.getReferenceById(id);
-        copyDtoToEntity(clientDto, client);
-        repository.save(client);
-        return new ClientDTO(client);
+        try{
+            Client client = repository.getReferenceById(id);
+            copyDtoToEntity(clientDto, client);
+            repository.save(client);
+            return new ClientDTO(client);
+        } catch (EntityNotFoundException e){
+            throw new ResourceNotFoundException("Customer does not exist");
+        }
     }
 
     @Transactional(readOnly = true)
     public ClientDTO searchClientById(Long id) {
-        Client client = repository.getReferenceById(id);
+        Client client = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Customer does not exist"));
         return new ClientDTO(client);
     }
 
@@ -48,7 +56,14 @@ public class ClientService {
 
     @Transactional(propagation = Propagation.SUPPORTS)
     public void deleteById(Long id) {
-        repository.deleteById(id);
+
+        if (!repository.existsById(id))
+            throw new ResourceNotFoundException("Customer does not exist");
+        try {
+            repository.deleteById(id);
+        } catch (DataIntegrityViolationException e) {
+            throw new DatabaseException("Referential integrity failure");
+        }
     }
 
     public void copyDtoToEntity(ClientDTO clientDto, Client client) {

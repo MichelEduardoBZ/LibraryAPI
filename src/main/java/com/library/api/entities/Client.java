@@ -20,7 +20,7 @@ public class Client {
     private String email;
     private LocalDate birthDate;
 
-    @OneToMany(mappedBy = "client")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "client")
     private Set<Phone> phones = new HashSet<>();
 
     @OneToMany(mappedBy = "client")
