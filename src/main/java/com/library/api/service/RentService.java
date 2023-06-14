@@ -1,6 +1,8 @@
 package com.library.api.service;
 
+import com.library.api.constants.PaymentStatus;
 import com.library.api.dto.RentDTO;
+import com.library.api.dto.RentPaymentDTO;
 import com.library.api.dto.RentPenaltyDTO;
 import com.library.api.entities.Book;
 import com.library.api.entities.Client;
@@ -9,6 +11,7 @@ import com.library.api.repository.BookRepository;
 import com.library.api.repository.ClientRepository;
 import com.library.api.repository.RentRepository;
 import com.library.api.service.exceptions.DatabaseException;
+import com.library.api.service.exceptions.InsufficientFundsException;
 import com.library.api.service.exceptions.ResourceNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +23,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class RentService {
@@ -86,43 +87,84 @@ public class RentService {
     }
 
     @Transactional
-    public Page<RentPenaltyDTO> validationPenaltyRent(Long id) {
-        DecimalFormat df = new DecimalFormat("###,##0.00");
+    public Page<RentPenaltyDTO> validationPenaltyRent(Long rentId) {
         LocalDate now = LocalDate.now();
 
-        List<Rent> rents = rentRepository.findRentsByClientId(id);
+        List<Rent> rents = rentRepository.findRentsByClientId(rentId);
         List<Rent> rentsValidatedDay = new ArrayList<>();
 
-        if (!rents.isEmpty()) {
-            List<RentPenaltyDTO> penaltyDTOs = new ArrayList<>();
-
-            for (Rent x : rents) {
-                LocalDate validationDay = x.getDevolutionDate().plus(30, ChronoUnit.DAYS);
-
-                if (now.isAfter(validationDay)) {
-                    rentsValidatedDay.add(x);
-                }
-            }
-
-            for (Rent x : rentsValidatedDay) {
-                Book book = bookRepository.getReferenceById(x.getBook().getId());
-
-                double valueBook = Double.parseDouble(String.valueOf(book.getPriceDayRent()));
-                double valueBookPenalty = valueBook * 0.1;
-
-                long daysDifference = ChronoUnit.DAYS.between(x.getDevolutionDate(), now) - 30;
-
-                for (int i = 1; i < daysDifference; i++) {
-                    valueBookPenalty += valueBook * 0.1 + valueBookPenalty;
-                }
-
-                RentPenaltyDTO rentPenaltyDTO = new RentPenaltyDTO(x.getClient().getName(), book.getTitle(), df.format(valueBookPenalty), String.valueOf(now));
-                penaltyDTOs.add(rentPenaltyDTO);
-            }
-            return new PageImpl<>(penaltyDTOs);
+        if (rents.isEmpty()) {
+            return Page.empty();
         }
-        return Page.empty();
+
+        List<RentPenaltyDTO> penaltyDTOs = new ArrayList<>();
+
+        for (Rent x : rents) {
+            LocalDate validationDay = x.getDevolutionDate().plus(30, ChronoUnit.DAYS);
+
+            if (now.isAfter(validationDay)) {
+                rentsValidatedDay.add(x);
+            }
+        }
+
+        for (Rent x : rentsValidatedDay) {
+            RentPenaltyDTO rentPenaltyDTO = new RentPenaltyDTO(x.getClient().getName(), x.getBook().getTitle(), penaltyCalculation(x, now), now);
+            penaltyDTOs.add(rentPenaltyDTO);
+        }
+
+        return new PageImpl<>(penaltyDTOs);
     }
+
+
+    @Transactional
+    public RentPaymentDTO paymentRent(RentPaymentDTO rentPaymentDTO) {
+
+        Rent rent = rentRepository.findById(rentPaymentDTO.getRentId()).orElseThrow(() -> new ResourceNotFoundException("Rent does not exist"));
+
+        if (rent.getPaymentStatus() == PaymentStatus.PAID) {
+            throw new ResourceNotFoundException("Rent does not exist");
+        }
+
+        LocalDate validatedBookReturnDay = LocalDate.parse(rentPaymentDTO.getBookReturnDay());
+
+        double cash = Double.valueOf(rentPaymentDTO.getCash().replace(",", "."));
+        double value = penaltyCalculation(rent, validatedBookReturnDay);
+
+        if (cash >= value) {
+            double cashBack = value - cash;
+            rent.setPaymentStatus(PaymentStatus.PAID);
+            return new RentPaymentDTO(rent.getId(), rent.getClient().getId(), rent.getBook().getId(), validatedBookReturnDay, Math.abs(cashBack), rent.getPaymentStatus());
+        } else {
+            throw new InsufficientFundsException("Insufficient funds. Required $: " + value);
+        }
+    }
+
+    public Double penaltyCalculation(Rent rent, LocalDate validatedBookReturnDay) {
+
+        Book book = bookRepository.getReferenceById(rent.getBook().getId());
+        double valueBook = Double.parseDouble(String.valueOf(book.getPriceDayRent()));
+
+        LocalDate validationDay = rent.getDevolutionDate().plus(30, ChronoUnit.DAYS);
+
+        if (validatedBookReturnDay.isAfter(validationDay)) {
+            long daysDifference = ChronoUnit.DAYS.between(validationDay, validatedBookReturnDay) - 30;
+            double valueBookPenalty = valueBook * 0.1;
+
+            for (int i = 1; i < Math.abs(daysDifference); i++) {
+                valueBookPenalty += valueBook * 0.1 + valueBookPenalty;
+            }
+
+            return valueBookPenalty;
+
+        } else {
+            LocalDate rentDate = rent.getRentDate();
+            LocalDate devolutionDate = rent.getDevolutionDate();
+            long daysDifference = ChronoUnit.DAYS.between(rentDate, devolutionDate);
+
+            return book.getPriceDayRent() * Double.parseDouble(String.valueOf(daysDifference));
+        }
+    }
+
 
     public void copyDtoToEntity(RentDTO rentDTO, Rent rent) {
         if (!rentDTO.getRentDate().isEmpty()) {
@@ -131,6 +173,10 @@ public class RentService {
 
         if (rentDTO.getDevolutionDate() != null) {
             rent.setDevolutionDate(LocalDate.parse(rentDTO.getDevolutionDate()));
+        }
+
+        if (rentDTO.getPaymentStatus() != null) {
+            rent.setPaymentStatus(PaymentStatus.valueOf(rentDTO.getPaymentStatus()));
         }
 
         if (rentDTO.getClientId() != 0) {

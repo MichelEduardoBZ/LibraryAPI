@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface RentRepository extends JpaRepository<Rent, Long> {
 
-    @Query("SELECT r FROM rent r WHERE r.client.id = :clientId")
+    @Query("SELECT r FROM rent r WHERE r.client.id = :clientId AND r.paymentStatus = 1")
     List<Rent> findRentsByClientId(@Param("clientId") Long clientId);
 
 }

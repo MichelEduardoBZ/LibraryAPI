@@ -3,6 +3,7 @@ package com.library.api.controller.handles;
 import com.library.api.dto.Errors.CustomError;
 import com.library.api.dto.Errors.ValidationError;
 import com.library.api.service.exceptions.DatabaseException;
+import com.library.api.service.exceptions.InsufficientFundsException;
 import com.library.api.service.exceptions.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,13 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(DatabaseException.class)
     public ResponseEntity<CustomError> dataBase(DatabaseException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        CustomError err = new CustomError(Instant.now(), status.value(), e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(InsufficientFundsException.class)
+    public ResponseEntity<CustomError> insufficientFunds(InsufficientFundsException e, HttpServletRequest request) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
         CustomError err = new CustomError(Instant.now(), status.value(), e.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);

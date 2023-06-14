@@ -40,7 +40,7 @@ public class PhoneService {
             phone = repository.save(phone);
             return new PhoneDTO(phone);
         } catch (EntityNotFoundException e){
-            throw  new ResourceNotFoundException("Phone does not exist");
+            throw new ResourceNotFoundException("Phone does not exist");
         }
     }
 

@@ -22,7 +22,7 @@ public class PhoneDTO {
     @JsonProperty(value = "client_id")
     private Long clientId;
 
-    public PhoneDTO(Phone entity){
+    public PhoneDTO(Phone entity) {
         id = entity.getId();
         phone = entity.getPhone();
         clientId = entity.getClient().getId();

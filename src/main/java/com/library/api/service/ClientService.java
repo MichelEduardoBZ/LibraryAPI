@@ -32,12 +32,12 @@ public class ClientService {
 
     @Transactional
     public ClientDTO updateClientById(Long id, ClientDTO clientDto) {
-        try{
+        try {
             Client client = repository.getReferenceById(id);
             copyDtoToEntity(clientDto, client);
             repository.save(client);
             return new ClientDTO(client);
-        } catch (EntityNotFoundException e){
+        } catch (EntityNotFoundException e) {
             throw new ResourceNotFoundException("Customer does not exist");
         }
     }

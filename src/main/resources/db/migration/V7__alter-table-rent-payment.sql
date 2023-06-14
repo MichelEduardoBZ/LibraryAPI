@@ -1,0 +1,1 @@
+ALTER TABLE tb_rent ADD COLUMN payment_status INTEGER NOT NULL;

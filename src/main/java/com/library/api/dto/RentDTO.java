@@ -32,10 +32,14 @@ public class RentDTO {
     @JsonProperty(value = "book_id")
     private Long bookId;
 
-    public RentDTO(Rent entity){
+    @JsonProperty(value = "payment_status")
+    private Integer paymentStatus;
+
+    public RentDTO(Rent entity) {
         id = entity.getId();
         rentDate = String.valueOf(entity.getRentDate());
         devolutionDate = String.valueOf(entity.getDevolutionDate());
+        paymentStatus = entity.getPaymentStatus().getCode();
         clientId = entity.getClient().getId();
         bookId = entity.getBook().getId();
     }

@@ -1,6 +1,7 @@
 package com.library.api.controller;
 
 import com.library.api.dto.RentDTO;
+import com.library.api.dto.RentPaymentDTO;
 import com.library.api.dto.RentPenaltyDTO;
 import com.library.api.service.RentService;
 import jakarta.validation.Valid;
@@ -33,6 +34,12 @@ public class RentController {
         return ResponseEntity.ok(rentDTO);
     }
 
+    @PutMapping(value = "/payment")
+    public ResponseEntity<RentPaymentDTO> paymentRent(@RequestBody @Valid RentPaymentDTO rentPaymentDTO) {
+        rentPaymentDTO = service.paymentRent(rentPaymentDTO);
+        return ResponseEntity.ok(rentPaymentDTO);
+    }
+
     @GetMapping
     public ResponseEntity<Page<RentDTO>> searchBooks(Pageable pageable) {
         Page<RentDTO> rentDtos = service.searchRents(pageable);
@@ -46,7 +53,7 @@ public class RentController {
     }
 
     @GetMapping(value = "penalty/{id}")
-    public ResponseEntity<Page<RentPenaltyDTO>> a(@PathVariable Long id) {
+    public ResponseEntity<Page<RentPenaltyDTO>> validationPenaltyRent(@PathVariable Long id) {
         Page<RentPenaltyDTO> rentPenaltyDTO = service.validationPenaltyRent(id);
         return ResponseEntity.ok(rentPenaltyDTO);
     }
